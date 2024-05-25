@@ -1,0 +1,9 @@
+spring:
+    application:
+        name: kfcgateway
+kkregistry:
+    servers: http://localhost:8085
+logging:
+    level:
+        root: info
+        cn.kimmking: debug
