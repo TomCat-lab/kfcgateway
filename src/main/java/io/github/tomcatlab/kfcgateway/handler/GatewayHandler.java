@@ -1,4 +1,4 @@
-package io.github.tomcatlab.kfcgateway;
+package io.github.tomcatlab.kfcgateway.handler;
 
 import cn.kimmking.kkrpc.core.api.RegistryCenter;
 import cn.kimmking.kkrpc.core.meta.InstanceMeta;

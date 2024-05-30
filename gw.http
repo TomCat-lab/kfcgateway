@@ -4,8 +4,28 @@ GET http://localhost:8080/hello
 ### Gateway
 GET http://localhost:8080/gw
 
-### POST user
+### Gateway
 POST http://localhost:8080/gw/com.cola.kfcrpc.demo.api.UserService
+Content-Type: application/json
+
+{
+  "service": "com.cola.kfcrpc.demo.api.UserService",
+  "methodSign": "findById@2_int_java.lang.String",
+  "args": [21,"cola"]
+}
+
+### POST rpc
+POST http://localhost:8080/gw/kfcrpc/com.cola.kfcrpc.demo.api.UserService
+Content-Type: application/json
+
+{
+  "service": "com.cola.kfcrpc.demo.api.UserService",
+  "methodSign": "findById@2_int_java.lang.String",
+  "args": [21,"cola"]
+}
+
+### POST direct
+POST http://localhost:8080/gw/direct/com.cola.kfcrpc.demo.api.UserService?backend=http://localhost:9052/kfcrpc
 Content-Type: application/json
 
 {
