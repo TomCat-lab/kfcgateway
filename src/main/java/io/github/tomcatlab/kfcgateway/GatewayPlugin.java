@@ -16,5 +16,5 @@ public interface GatewayPlugin {
     void  stop();
     String getName();
     boolean support(ServerWebExchange exchange);
-    Mono<Void> handle(ServerWebExchange exchange);
+    Mono<Void> handle(ServerWebExchange exchange ,GatewayPluginChain pluginChain);
 }

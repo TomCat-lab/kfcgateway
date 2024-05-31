@@ -4,6 +4,7 @@ import cn.kimmking.kkrpc.core.api.RegistryCenter;
 import cn.kimmking.kkrpc.core.meta.InstanceMeta;
 import cn.kimmking.kkrpc.core.meta.ServiceMeta;
 import io.github.tomcatlab.kfcgateway.AbstractGatewayPlugin;
+import io.github.tomcatlab.kfcgateway.GatewayPluginChain;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
@@ -35,7 +36,7 @@ public class KfcRpcPlugin extends AbstractGatewayPlugin {
     }
 
     @Override
-    public Mono<Void> doHandle(ServerWebExchange exchange) {
+    public Mono<Void> doHandle(ServerWebExchange exchange, GatewayPluginChain pluginChain) {
         System.out.println("=======>>>>>>> [KFCRpcPlugin] ...");
         // 1. 通过请求路径或者服务名
         String service = exchange.getRequest().getPath().value().substring(prefix.length());
@@ -48,7 +49,8 @@ public class KfcRpcPlugin extends AbstractGatewayPlugin {
         Flux<DataBuffer> body = exchange.getRequest().getBody();
         Mono<String> entity = WebClient.create(url).post().contentType(MediaType.asMediaType(MediaType.APPLICATION_JSON)).body(body,DataBuffer.class).retrieve().bodyToMono(String.class);
         exchange.getResponse().getHeaders().set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        return entity.flatMap(x->exchange.getResponse().writeWith(Mono.just( exchange.getResponse().bufferFactory().wrap(x.getBytes()))));
+        return entity.flatMap(x->exchange.getResponse().writeWith(Mono.just( exchange.getResponse().bufferFactory().wrap(x.getBytes()))))
+                .then(pluginChain.handle(exchange));
     }
 
     @Override

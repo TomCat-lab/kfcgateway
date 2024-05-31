@@ -3,6 +3,7 @@ package io.github.tomcatlab.kfcgateway.handler;
 import cn.kimmking.kkrpc.core.api.RegistryCenter;
 import cn.kimmking.kkrpc.core.meta.InstanceMeta;
 import cn.kimmking.kkrpc.core.meta.ServiceMeta;
+import io.github.tomcatlab.kfcgateway.DefaultGatewayPluginChain;
 import io.github.tomcatlab.kfcgateway.GatewayPlugin;
 import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,22 +29,21 @@ public class GatewayWebHandler  implements WebHandler {
     @Override
     public reactor.core.publisher.Mono<Void> handle(ServerWebExchange exchange) {
         System.out.println(" ====> Kfc gateway web handler ...");
-        if (CollectionUtils.isEmpty(gatewayPlugins)){
-            String mock ="""
-                    {"result":"no plugin"}
-                    """;
-            return exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory().wrap(mock.getBytes())));
-        }
-
-        for (GatewayPlugin gatewayPlugin : gatewayPlugins) {
-            if (gatewayPlugin.support(exchange)){
-                return gatewayPlugin.handle(exchange);
-            }
-        }
-
         String mock ="""
                     {"result":"no plugin"}
                     """;
-        return exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory().wrap(mock.getBytes())));
+        if (CollectionUtils.isEmpty(gatewayPlugins)){
+            return exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory().wrap(mock.getBytes())));
+        }
+
+       return new DefaultGatewayPluginChain(gatewayPlugins).handle(exchange);
+
+//        for (GatewayPlugin gatewayPlugin : gatewayPlugins) {
+//            if (gatewayPlugin.support(exchange)){
+//                return gatewayPlugin.handle(exchange);
+//            }
+//        }
+
+//        return exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory().wrap(mock.getBytes())));
     }
 }
